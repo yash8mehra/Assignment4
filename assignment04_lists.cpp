@@ -141,7 +141,7 @@ template <typename T> class List{
         int len = 0;
  
         // start at the head of the list
-        Node<int>* temp = this->head;
+        Node<T>* temp = this->head;
 
         // count the nodes all the way to NULL
         while(temp != NULL){
