@@ -37,12 +37,10 @@ template <typename T> class Node{
     }
 
     ~Node(){
-      // call destructors for the rest of the list
-
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-      cout<<"    ~Node(): you need to write this method <-------------"<<endl;
+      if(this->next != NULL){
+        this->next->~Node();
+        this->next = NULL;
+      }
 
       // DO NOT REMOVE THE NEXT LINE: keep at end of your destructor method!!
       DN += 1;  // keep track of deallocations
@@ -62,10 +60,10 @@ template <typename T> class List{
       // destroy the list by destroying the nodes
       ~List(){
 
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    ~List(): you need to write this method <-------------"<<endl;
+        if(this->head != NULL){
+          this->head->~Node(); 
+          this->head = NULL;
+      }
 
         DN += 1;  // keep track of deallocations
       }
@@ -79,24 +77,39 @@ template <typename T> class List{
       // addLast(item) adds an element item of type T at the end of the list
       void addLast(T item){
 
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    addLast(item): you need to write this method <-------------"<<endl;
-
-        // cout<<"new node added at back!"<<endl; // your method MUST use this!
+        Node<T>* pNode = new Node<T>;
+        pNode->element = item;
+        pNode->next    = NULL; 
+ 
+        if(this->head == NULL){
+          // List is empty the new node becomes the head
+          this->head = pNode;
+        }
+        else{
+          // go to the last node in the list
+          Node<T>* temp = this->head;
+          while(temp->next != NULL){
+            temp = temp->next;
+          }
+          // Attach the new node after the current tail
+          temp->next = pNode;
+        }
+ 
+        cout<<"new node added at back!"<<endl;
       }
 
       // addFront(item) creates and adds a new element node 
       // containing item at the front of the list
       void addFront(T item){
 
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    addFront(item): you need to write this method <-------------"<<endl;
-
-        // cout<<"new node added at front !"<<endl; // your method MUST use this!
+        Node<T>* pNode = new Node<T>;
+        pNode->element = item;
+ 
+        // Point the new node to the current head, then update head
+        pNode->next  = this->head;
+        this->head   = pNode;
+ 
+        cout<<"new node added at front !"<<endl;
       }
 
       // addAt(index, item) creates and adds a new element node containing 
@@ -141,7 +154,7 @@ template <typename T> class List{
         int len = 0;
  
         // start at the head of the list
-        Node<T>* temp = this->head;
+        Node<int>* temp = this->head;
 
         // count the nodes all the way to NULL
         while(temp != NULL){
@@ -179,12 +192,28 @@ template <typename T> class List{
       // removeLast() deletes the last element and its node in the list
       void removeLast(){
 
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    removeLast(): you need to write this method <-------------"<<endl;
+      if(this->isEmpty()){
+          cout<<"The list is empty !"<<endl;
+          return;
+        }
+ 
+        if(this->head->next == NULL){
+          // Only one node in the list — destroy it and reset head
+          this->head->~Node();
+          this->head = NULL;
+        }
+        else{
+          // Walk to the second-to-last node
+          Node<T>* temp = this->head;
+          while(temp->next->next != NULL){
+            temp = temp->next;
+          }
 
-          // cout<<"last item removed"<<endl; // your method MUST use this!
+          temp->next->~Node();  // destroy the last node
+          temp->next = NULL;
+        }
+ 
+        cout<<"last item removed"<<endl;
       }
 
       // removeAt(index) deletes the element and its node found at 
@@ -223,24 +252,43 @@ template <typename T> class List{
       // removeFront() deletes the last element and its node in the list
       void removeFront(){
        
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    removeFront(): you need to write this method <-------------"<<endl;
-
-          // cout<<"front item removed"<<endl; // your method MUST use this!
-
+        if(this->isEmpty()){
+          cout<<"The list is empty !"<<endl;
+          return;
+        }
+ 
+        Node<T>* pNode = this->head;   // save pointer to the current head
+        this->head = this->head->next; // advance head to the second node
+        pNode->next = NULL;            // isolate the removed node (no chain destruction)
+        pNode->~Node();                // destroy only the single removed node
+ 
+        cout<<"front item removed"<<endl;
       }
 
       // getAt(int index) returns the element found at position index in the list
       T getAt(int index){
         T res = -9999;        // initialize the results to invalid element
 
-/********************************************************************************
-        // replace the following line with your code!!!!!
-*********************************************************************************/
-        cout<<"    getAt(): you need to write this method <-------------"<<endl;
-
+       if(this->isEmpty()){
+          cout<<"linked list is empty !"<<endl;
+          return res;
+        }
+ 
+        //index out of bounds
+        if(index < 0 || index >= this->size()){
+          cout<<"index out of bound !"<<endl;
+          return res;
+        }
+ 
+        // Walk to the node at the requested index
+        int count = 0;
+        Node<T>* temp = this->head;
+        while(count < index){
+          count++;
+          temp = temp->next;
+        }
+ 
+        res = temp->element;  // retrieve the stored element
         return res;  // return the results -- YOU MUST USE THIS!!!!
       }
 };
